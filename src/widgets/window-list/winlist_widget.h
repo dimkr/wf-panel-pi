@@ -25,33 +25,24 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ============================================================================*/
 
-#ifndef WIDGETS_LAUNCHER_HPP
-#define WIDGETS_LAUNCHER_HPP
+#ifndef WIDGETS_WINLIST_H
+#define WIDGETS_WINLIST_H
 
-#include <widget.hpp>
-#include <gtkmm/hvbox.h>
+#include <widget.h>
 
-extern "C" {
 #include "plugin.h"
-#include "launchers.h"
-}
+#include "winlist.h"
 
-class WidgetLauncher : public PanelWidget
+typedef struct
 {
-    LauncherPlugin *lch;
+    PanelWidget parent;
 
-    std::unique_ptr <Gtk::HBox> plugin;
+    WinlistPlugin *wl;
 
-  public:
+    GtkWidget *plugin;
+} WidgetWinlist;
 
-    void widget_init (Gtk::HBox *container) override;
-    virtual ~WidgetLauncher ();
-    void widget_command (const char *cmd) override;
-    void widget_set_icon (void);
-    void widget_config_reload (void);
-};
-
-#endif /* end of include guard: WIDGETS_LAUNCHER_HPP */
+#endif /* end of include guard: WIDGETS_WINLIST_H */
 
 /* End of file */
 /*----------------------------------------------------------------------------*/

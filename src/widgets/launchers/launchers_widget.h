@@ -25,63 +25,24 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ============================================================================*/
 
-#include <glibmm.h>
-#include "launchers.hpp"
+#ifndef WIDGETS_LAUNCHER_H
+#define WIDGETS_LAUNCHER_H
 
-extern "C" {
-    PanelWidget *create () { return new WidgetLauncher; }
-    void destroy (PanelWidget *w) { delete w; }
+#include <widget.h>
 
-    const conf_table_t *config_params (void) { return conf_table; };
-    const char *display_name (void) { return PLUGIN_TITLE; };
-    const char *package_name (void) { return GETTEXT_PACKAGE; };
-}
+#include "plugin.h"
+#include "launchers.h"
 
-void WidgetLauncher::widget_command (const char *cmd)
+typedef struct
 {
-    launcher_control_msg (lch, cmd);
-}
+    PanelWidget parent;
 
-void WidgetLauncher::widget_set_icon (void)
-{
-    launcher_update_display (lch);
-}
+    LauncherPlugin *lch;
 
-void WidgetLauncher::widget_config_reload (void)
-{
-    gboolean changed = load_configuration_data (PLUGIN_NAME, conf_table);
+    GtkWidget *plugin;
+} WidgetLauncher;
 
-    char *ostr = g_strdup (lch->launchers);
-    g_free (lch->launchers);
-    get_config_string ("panel", "launchers", &lch->launchers, "");
-    if (g_strcmp0 (lch->launchers, ostr)) changed = TRUE;
-    g_free (ostr);
-
-    if (changed) launcher_update_display (lch);
-}
-
-void WidgetLauncher::widget_init (Gtk::HBox *container)
-{
-    /* Create the button */
-    plugin = std::make_unique <Gtk::HBox> ();
-    plugin->set_name (PLUGIN_NAME);
-    container->pack_start (*plugin, false, false);
-
-    /* Setup structure */
-    lch = g_new0 (LauncherPlugin, 1);
-    lch->plugin = (GtkWidget *)((*plugin).gobj());
-
-    /* Initialise the plugin */
-    launcher_set_values (lch);
-    load_configuration_data (PLUGIN_NAME, conf_table);
-    get_config_string ("panel", "launchers", &lch->launchers, "");
-    launcher_init (lch);
-}
-
-WidgetLauncher::~WidgetLauncher()
-{
-    launcher_destructor (lch);
-}
+#endif /* end of include guard: WIDGETS_LAUNCHER_H */
 
 /* End of file */
 /*----------------------------------------------------------------------------*/

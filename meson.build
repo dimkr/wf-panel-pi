@@ -1,19 +1,17 @@
 project(
     'wf-panel-pi',
     'c',
-    'cpp',
     version: run_command(['dpkg-parsechangelog', '--show-field', 'Version']).stdout().strip(),
     meson_version: '>=0.60.0',
     default_options: [
-        'cpp_std=c++17',
         'c_std=c11',
         'warning_level=2',
         'werror=false',
     ],
 )
 
-add_project_arguments(['-Wno-pedantic', '-Wno-unused-parameter', '-Wno-parentheses'], language: 'cpp')
-add_project_arguments('-D_GNU_SOURCE', language : [ 'c', 'cpp' ])
+add_project_arguments(['-Wno-pedantic', '-Wno-unused-parameter', '-Wno-parentheses'], language: 'c')
+add_project_arguments('-D_GNU_SOURCE', language : [ 'c' ])
 
 share_dir = join_paths(get_option('prefix'), 'share')
 applications_dir = join_paths(share_dir, 'applications')
@@ -25,17 +23,17 @@ sysconf_dir = join_paths(get_option('prefix'), get_option('sysconfdir'))
 
 gettext_package = meson.project_name()
 
-add_project_arguments('-DPACKAGE_DATA_DIR="' + resource_dir + '"', language : [ 'c', 'cpp' ])
-add_project_arguments('-DGETTEXT_PACKAGE="' + gettext_package + '"', language : [ 'c', 'cpp' ])
-add_project_arguments('-DPACKAGE_LOCALE_DIR="' + share_dir + '/locale"', language : [ 'c', 'cpp' ])
+add_project_arguments('-DPACKAGE_DATA_DIR="' + resource_dir + '"', language : [ 'c' ])
+add_project_arguments('-DGETTEXT_PACKAGE="' + gettext_package + '"', language : [ 'c' ])
+add_project_arguments('-DPACKAGE_LOCALE_DIR="' + share_dir + '/locale"', language : [ 'c' ])
 
 wayland_client = dependency('wayland-client')
 wayland_protos = dependency('wayland-protocols')
 
 subdir('proto')
 
-gtkmm = dependency('gtkmm-3.0', version: '>=3.24')
-deps = [ wf_protos, gtkmm ]
+gtk = dependency('gtk+-3.0', version: '>=3.24')
+deps = [ wf_protos, gtk ]
 
 subdir('data')
 subdir('src')

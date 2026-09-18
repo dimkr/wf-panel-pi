@@ -2,7 +2,7 @@ name = 'launchers'
 
 sources = files(
   'launchers.c',
-  'launchers.cpp'
+  'launchers_widget.c'
 )
 
 shared_module(name, sources,
@@ -10,6 +10,5 @@ shared_module(name, sources,
         install: true,
         install_dir: get_option('libdir') / 'wf-panel-pi',
         c_args : '-DPLUGIN_NAME="' + name + '"',
-        cpp_args : '-DPLUGIN_NAME="' + name + '"',
         include_directories : incdir
 )

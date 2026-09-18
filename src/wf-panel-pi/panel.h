@@ -2,6 +2,8 @@
 Copyright (c) 2026 Raspberry Pi
 All rights reserved.
 
+Some code based on the wf-shell project copyright (c) 2018 Ilia Bozhinov
+
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
     * Redistributions of source code must retain the above copyright
@@ -25,33 +27,57 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ============================================================================*/
 
-#ifndef WIDGETS_WINLIST_HPP
-#define WIDGETS_WINLIST_HPP
+#ifndef PANEL_H
+#define PANEL_H
 
-#include <widget.hpp>
-#include <gtkmm/scrolledwindow.h>
+#include <gtk/gtk.h>
 
-extern "C" {
-#include "plugin.h"
-#include "winlist.h"
-}
+#include "widget.h"
+#include "autohide-window.h"
 
-class WidgetWinlist : public PanelWidget
+typedef struct _Panel Panel;
+
+struct _Panel
 {
-    WinlistPlugin *wl;
+    AutohidingWindow *window;
 
-    std::unique_ptr <Gtk::ScrolledWindow> plugin;
+    GtkWidget *content_box;
+    GtkWidget *left_box, *right_box, *right2_box;
+    GtkWidget *grid;
+    GtkWidget *menu;
+    GtkWidget *conf;
+    GtkWidget *cplug;
+    GtkWidget *notif;
+    GtkWidget *appset;
+    GtkWidget *sep;
+    GtkGesture *gesture;
+    gulong draw_connection;
 
-  public:
+    GList *left_widgets, *right_widgets;
 
-    void widget_init (Gtk::HBox *container) override;
-    virtual ~WidgetWinlist ();
-    void widget_command (const char *cmd) override;
-    void widget_set_icon (void);
-    void widget_config_reload (void);
+    gboolean dock;
+    gboolean wizard;
+    int scaling;
+
+    gboolean pending_update;
+
+    int icon_size;
+    char *left_widgets_opt;
+    char *right_widgets_opt;
+    gboolean exclusive;
+
+    int notify_timeout;
+    gboolean notifications;
+    gboolean libnotify;
 };
 
-#endif /* end of include guard: WIDGETS_WINLIST_HPP */
+extern Panel *panel_new (gboolean is_dock);
+extern void panel_free (Panel *panel);
+extern void panel_handle_config_reload (Panel *panel);
+extern void panel_handle_command_message (Panel *panel, const char *plugin, const char *cmd);
+extern void panel_monitor_update_pending (Panel *panel, gboolean pend);
+
+#endif /* end of include guard: PANEL_H */
 
 /* End of file */
 /*----------------------------------------------------------------------------*/

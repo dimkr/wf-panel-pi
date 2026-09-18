@@ -27,45 +27,36 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ============================================================================*/
 
-#ifndef AUTOHIDE_WINDOW_HPP
-#define AUTOHIDE_WINDOW_HPP
+#ifndef AUTOHIDE_WINDOW_H
+#define AUTOHIDE_WINDOW_H
 
-#include <gtkmm/window.h>
+#include <gtk/gtk.h>
 #include <gdk/gdkwayland.h>
 #include <gtk-layer-shell/gtk-layer-shell.h>
 
-class AutohidingWindow : public Gtk::Window
+typedef struct _AutohidingWindow AutohidingWindow;
+
+struct _AutohidingWindow
 {
-  public:
-    AutohidingWindow (bool is_dock);
-    AutohidingWindow (AutohidingWindow&&) = delete;
-    AutohidingWindow (const AutohidingWindow&) = delete;
-    AutohidingWindow& operator = (const AutohidingWindow&) = delete;
-    AutohidingWindow& operator = (AutohidingWindow&&) = delete;
-    ~AutohidingWindow ();
-    void set_auto_exclusive_zone (bool has_zone = false);
-    void set_monitor ();
-    void update_position ();
-    void handle_config_reload ();
+    GtkWidget *window;
 
-  private:
-    bool dock;
+    gboolean dock;
 
-    std::string position;
-    std::string layer;
-    std::string monitor;
+    char *position;
+    char *layer;
+    char *monitor;
     int offset;
     int remainder;
-    bool autohide;
+    gboolean autohide;
     int duration;
 
     int autohide_counter;
-    bool has_auto_exclusive_zone = false;
-    bool input_inside_panel = false;
-    bool noleave = false;
+    gboolean has_auto_exclusive_zone;
+    gboolean input_inside_panel;
+    gboolean noleave;
 
-    bool last_autohide_value;
-    int last_zone = 0;
+    gboolean last_autohide_value;
+    int last_zone;
 
     int start_marg;
     int targ_marg;
@@ -81,26 +72,19 @@ class AutohidingWindow : public Gtk::Window
      * to the new pointer. By making mon a global, the pointer is retained even
      * when freed by GDK, preventing an old pointer being reused for a new monitor.
      */
-    Glib::RefPtr <Gdk::Monitor> mon;
+    GdkMonitor *mon;
 
-    sigc::connection pending_show, pending_hide;
-
-    GtkLayerShellEdge get_anchor_edge ();
-    void increase_autohide ();
-    void decrease_autohide ();
-    bool should_autohide () const;
-    bool do_show ();
-    bool do_hide ();
-    void schedule_hide (int delay);
-    void schedule_show (int delay);
-    void update_margin ();
-    void update_autohide ();
-    void set_layer ();
-    void start_animation (int target);
-    unsigned char load_config ();
+    guint pending_show, pending_hide;
 };
 
-#endif /* end of include guard: AUTOHIDE_WINDOW_HPP */
+extern AutohidingWindow *autohide_window_new (gboolean is_dock);
+extern void autohide_window_free (AutohidingWindow *win);
+extern void autohide_window_set_auto_exclusive_zone (AutohidingWindow *win, gboolean has_zone);
+extern void autohide_window_set_monitor (AutohidingWindow *win);
+extern void autohide_window_update_position (AutohidingWindow *win);
+extern void autohide_window_handle_config_reload (AutohidingWindow *win);
+
+#endif /* end of include guard: AUTOHIDE_WINDOW_H */
 
 /* End of file */
 /*----------------------------------------------------------------------------*/

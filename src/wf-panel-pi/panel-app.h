@@ -2,6 +2,8 @@
 Copyright (c) 2026 Raspberry Pi
 All rights reserved.
 
+Some code based on the wf-shell project copyright (c) 2018 Ilia Bozhinov
+
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
     * Redistributions of source code must retain the above copyright
@@ -25,57 +27,36 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ============================================================================*/
 
-#include <glibmm.h>
-#include "winlist.hpp"
+#ifndef PANEL_APP_H
+#define PANEL_APP_H
 
-extern "C" {
-    PanelWidget *create () { return new WidgetWinlist; }
-    void destroy (PanelWidget *w) { delete w; }
+#include <gtk/gtk.h>
+#include <menu-cache.h>
 
-    const conf_table_t *config_params (void) { return conf_table; };
-    const char *display_name (void) { return PLUGIN_TITLE; };
-    const char *package_name (void) { return GETTEXT_PACKAGE; };
-}
+typedef struct _Panel Panel;
 
-void WidgetWinlist::widget_command (const char *cmd)
+typedef struct _PanelApp PanelApp;
+
+struct _PanelApp
 {
-    wlist_control_msg (wl, cmd);
-}
+    GtkApplication *app;
 
-void WidgetWinlist::widget_set_icon (void)
-{
-    wlist_update_display (wl);
-}
+    Panel *panel;
+    Panel *dock;
 
-void WidgetWinlist::widget_config_reload (void)
-{
-    if (load_configuration_data (PLUGIN_NAME, conf_table)) wlist_update_display (wl);
-}
+    guint hotplug_timer;
 
-void WidgetWinlist::widget_init (Gtk::HBox *container)
-{
-    /* Create the button */
-    plugin = std::make_unique <Gtk::ScrolledWindow> ();
-    plugin->set_name (PLUGIN_NAME);
-    plugin->set_propagate_natural_width (true);
-    plugin->set_policy (Gtk::POLICY_EXTERNAL, Gtk::POLICY_NEVER);
+    GDBusNodeInfo *introspection_data;
+    GDBusInterfaceVTable *interface_vtable;
+    guint owner_id;
 
-    container->pack_start (*plugin, false, false);
+    int inotify_fd;
+    guint inotify_source;
+};
 
-    /* Setup structure */
-    wl = g_new0 (WinlistPlugin, 1);
-    wl->plugin = (GtkWidget *)((*plugin).gobj());
+extern void panel_app_create (int argc, char **argv);
 
-    /* Initialise the plugin */
-    wlist_set_values (wl);
-    load_configuration_data (PLUGIN_NAME, conf_table);
-    wlist_init (wl);
-}
-
-WidgetWinlist::~WidgetWinlist()
-{
-    wlist_destructor (wl);
-}
+#endif /* end of include guard: PANEL_APP_H */
 
 /* End of file */
 /*----------------------------------------------------------------------------*/

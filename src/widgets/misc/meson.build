@@ -1,23 +1,23 @@
-shared_module('separator', 'separator.cpp',
+shared_module('separator', 'separator.c',
         dependencies: deps,
         install: true,
         install_dir: get_option('libdir') / 'wf-panel-pi',
-        cpp_args : '-DPLUGIN_NAME="separator"',
+        c_args : '-DPLUGIN_NAME="separator"',
         include_directories : incdir
 )
 
-shared_module('spacing', 'spacing.cpp',
+shared_module('spacing', 'spacing.c',
         dependencies: deps,
         install: true,
         install_dir: get_option('libdir') / 'wf-panel-pi',
-        cpp_args : '-DPLUGIN_NAME="spacing"',
+        c_args : '-DPLUGIN_NAME="spacing"',
         include_directories : incdir
 )
 
-shared_module('split', 'split.cpp',
+shared_module('split', 'split.c',
         dependencies: deps,
         install: true,
         install_dir: get_option('libdir') / 'wf-panel-pi',
-        cpp_args : '-DPLUGIN_NAME="split"',
+        c_args : '-DPLUGIN_NAME="split"',
         include_directories : incdir
 )

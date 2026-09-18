@@ -1,10 +1,10 @@
 name = 'tray'
 
 sources = files(
-  'watcher.cpp',
-  'tray.cpp',
-  'item.cpp',
-  'host.cpp'
+  'watcher.c',
+  'tray.c',
+  'item.c',
+  'host.c'
 )
 
 dbusmenu_gtk = dependency('dbusmenu-gtk3-0.4')
@@ -14,6 +14,6 @@ shared_module(name, sources,
         dependencies: deps + module_deps,
         install: true,
         install_dir: get_option('libdir') / 'wf-panel-pi',
-        cpp_args : '-DPLUGIN_NAME="' + name + '"',
+        c_args : '-DPLUGIN_NAME="' + name + '"',
         include_directories : incdir
 )
