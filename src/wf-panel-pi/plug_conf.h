@@ -46,11 +46,11 @@ typedef struct {
     const char *def_val;
 } conf_table_t;
 
-#define WIDGETS_LEFT_PANEL      "smenu spacing0 spacing4 tlist"
-#define WIDGETS_LEFT_DOCK       ""
+#define WIDGETS_LEFT_PANEL      ""
+#define WIDGETS_LEFT_DOCK       "smenu spacing0 spacing4 tlist"
 #define WIDGETS_LEFT_WIZARD     ""
-#define WIDGETS_RIGHT_PANEL     "tray power ejecter updater spacing2 connect spacing2 bluetooth spacing2 netman spacing2 volumepulse spacing2 clock spacing2 batt spacing2 squeek"
-#define WIDGETS_RIGHT_DOCK      ""
+#define WIDGETS_RIGHT_PANEL     ""
+#define WIDGETS_RIGHT_DOCK      "tray power ejecter updater spacing2 connect spacing2 bluetooth spacing2 netman spacing2 volumepulse spacing2 clock spacing2 batt spacing2 squeek"
 #define WIDGETS_RIGHT_WIZARD    "bluetooth volumepulse squeek"
 
 extern GtkWidget *cdlg;
