@@ -1,27 +1,34 @@
-#include "winlist_widget.h"
+#include "tlist_widget.h"
 
-static void widget_winlist_command (PanelWidget *self, const char *cmd)
+static void widget_tlist_command (PanelWidget *self, const char *cmd)
 {
     WidgetWinlist *w = (WidgetWinlist *) self;
 
     wlist_control_msg (w->wl, cmd);
 }
 
-static void widget_winlist_set_icon (PanelWidget *self)
+static void widget_tlist_set_icon (PanelWidget *self)
 {
     WidgetWinlist *w = (WidgetWinlist *) self;
 
     wlist_update_display (w->wl);
 }
 
-static void widget_winlist_config_reload (PanelWidget *self)
+static void widget_tlist_config_reload (PanelWidget *self)
 {
     WidgetWinlist *w = (WidgetWinlist *) self;
+    gboolean changed = load_configuration_data (PLUGIN_NAME, conf_table);
 
-    if (load_configuration_data (PLUGIN_NAME, conf_table)) wlist_update_display (w->wl);
+    char *ostr = g_strdup (w->wl->launchers);
+    g_free (w->wl->launchers);
+    get_config_string ("panel", "launchers", &w->wl->launchers, "");
+    if (g_strcmp0 (w->wl->launchers, ostr)) changed = TRUE;
+    g_free (ostr);
+
+    if (changed) wlist_update_display (w->wl);
 }
 
-static void widget_winlist_init (PanelWidget *self, GtkWidget *container)
+static void widget_tlist_init (PanelWidget *self, GtkWidget *container)
 {
     WidgetWinlist *w = (WidgetWinlist *) self;
 
@@ -40,10 +47,11 @@ static void widget_winlist_init (PanelWidget *self, GtkWidget *container)
     /* Initialise the plugin */
     wlist_set_values (w->wl);
     load_configuration_data (PLUGIN_NAME, conf_table);
+    get_config_string ("panel", "launchers", &w->wl->launchers, "");
     wlist_init (w->wl);
 }
 
-static void widget_winlist_free (PanelWidget *self)
+static void widget_tlist_free (PanelWidget *self)
 {
     WidgetWinlist *w = (WidgetWinlist *) self;
 
@@ -55,11 +63,11 @@ PanelWidget *create (void)
 {
     WidgetWinlist *w = g_new0 (WidgetWinlist, 1);
 
-    w->parent.widget_init = widget_winlist_init;
-    w->parent.widget_free = widget_winlist_free;
-    w->parent.widget_command = widget_winlist_command;
-    w->parent.widget_set_icon = widget_winlist_set_icon;
-    w->parent.widget_config_reload = widget_winlist_config_reload;
+    w->parent.widget_init = widget_tlist_init;
+    w->parent.widget_free = widget_tlist_free;
+    w->parent.widget_command = widget_tlist_command;
+    w->parent.widget_set_icon = widget_tlist_set_icon;
+    w->parent.widget_config_reload = widget_tlist_config_reload;
 
     return (PanelWidget *) w;
 }

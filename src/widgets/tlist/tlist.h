@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* Typedefs and macros                                                        */
 /*----------------------------------------------------------------------------*/
 
-#define PLUGIN_TITLE N_("Window List")
+#define PLUGIN_TITLE N_("Icon Tasklist")
 
 #define STATE_ACTIVATED 0x01
 #define STATE_MAXIMISED 0x02
@@ -43,12 +43,13 @@ typedef struct
     GtkWidget *plugin;
     GtkWidget *box;
 
+    GList *buttons;
+
     GList *windows;
 
+    char *launchers;                /* List of launchers */
+
     int spacing;
-    int max_width;
-    int item_width;
-    gboolean icons_only;
 
     GtkWidget *dragbtn;
     float drag_start;
@@ -57,8 +58,6 @@ typedef struct
 
     struct wl_registry *registry;
     struct zwlr_foreign_toplevel_manager_v1 *manager;
-
-    guint idle_timer;
 } WinlistPlugin;
 
 typedef struct
@@ -69,14 +68,25 @@ typedef struct
     char *app_id;
     char *title;
     int state;
-    GtkWidget *btn;
-    GtkWidget *icon;
-    GtkWidget *label;
-    GtkGesture *gesture;
-    GtkGesture *dgesture;
 } WindowItem;
 
-extern conf_table_t conf_table[4];
+typedef struct
+{
+    WinlistPlugin *plugin;
+    char *app_id;
+    char *launch_id;
+    char *alt_launch_id;
+    char *tooltip;
+    int windows;
+    GtkWidget *btn;
+    GtkWidget *icon;
+    GtkGesture *gesture;
+    GtkGesture *dgesture;
+    gboolean launcher;
+} WindowBtn;
+
+
+extern conf_table_t conf_table[2];
 
 /*----------------------------------------------------------------------------*/
 /* Prototypes                                                                 */

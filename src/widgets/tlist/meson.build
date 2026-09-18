@@ -1,9 +1,9 @@
-name = 'window-list'
+name = 'tlist'
 menu_cache = dependency('libmenu-cache')
 
 sources = files(
-  'winlist.c',
-  'winlist_widget.c'
+  'tlist.c',
+  'tlist_widget.c'
 )
 
 module_deps = [ menu_cache ]

@@ -30,9 +30,9 @@ src/widgets/tray/tray.c
 src/widgets/tray/tray.h
 src/widgets/tray/watcher.c
 src/widgets/tray/watcher.h
-src/widgets/window-list/winlist.c
-src/widgets/window-list/winlist.h
-src/widgets/window-list/winlist_widget.c
-src/widgets/window-list/winlist_widget.h
+src/widgets/tlist/tlist.c
+src/widgets/tlist/tlist.h
+src/widgets/tlist/tlist_widget.c
+src/widgets/tlist/tlist_widget.h
 [type: gettext/glade] data/config.ui
 [type: gettext/glade] data/wf-panel-pi.ui

@@ -1,4 +1,4 @@
 subdir('launchers')
-subdir('window-list')
+subdir('tlist')
 subdir('tray')
 subdir('misc')

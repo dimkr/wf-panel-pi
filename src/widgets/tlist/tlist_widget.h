@@ -25,13 +25,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ============================================================================*/
 
-#ifndef WIDGETS_WINLIST_H
-#define WIDGETS_WINLIST_H
+#ifndef WIDGETS_TLIST_H
+#define WIDGETS_TLIST_H
 
 #include <widget.h>
 
 #include "plugin.h"
-#include "winlist.h"
+#include "tlist.h"
 
 typedef struct
 {
@@ -42,7 +42,7 @@ typedef struct
     GtkWidget *plugin;
 } WidgetWinlist;
 
-#endif /* end of include guard: WIDGETS_WINLIST_H */
+#endif /* end of include guard: WIDGETS_TLIST_H */
 
 /* End of file */
 /*----------------------------------------------------------------------------*/
