@@ -48,6 +48,12 @@ src/widgets/clock/clock.c
 src/widgets/clock/clock.h
 src/widgets/clock/clock_widget.c
 src/widgets/clock/clock_widget.h
+src/widgets/batt/batt.c
+src/widgets/batt/batt.h
+src/widgets/batt/batt_sys.c
+src/widgets/batt/batt_sys.h
+src/widgets/batt/batt_widget.c
+src/widgets/batt/batt_widget.h
 [type: gettext/glade] data/config.ui
 [type: gettext/glade] data/wf-panel-pi.ui
 [type: gettext/glade] data/lxplug-volumepulse.ui
