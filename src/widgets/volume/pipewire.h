@@ -1,5 +1,5 @@
 /*============================================================================
-Copyright (c) 2023 Raspberry Pi
+Copyright (c) 2020-2025 Raspberry Pi
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,43 +25,37 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ============================================================================*/
 
-#ifndef PLUG_CONF_H
-#define PLUG_CONF_H
+/*----------------------------------------------------------------------------*/
+/* Prototypes                                                                 */
+/*----------------------------------------------------------------------------*/
 
-typedef enum {
-    CONF_TYPE_NONE,
-    CONF_TYPE_BOOL,
-    CONF_TYPE_INT,
-    CONF_TYPE_STRING,
-    CONF_TYPE_COLOUR,
-    CONF_TYPE_FONT,
-    CONF_TYPE_LABEL
-} CONF_TYPE;
+extern void pw_backend_init (VolumePlugin *vol);
+extern void pw_backend_terminate (VolumePlugin *vol);
 
-typedef struct {
-    CONF_TYPE type;
-    const char *name;
-    const char *label;
-    void **value;
-    const char *def_val;
-} conf_table_t;
+extern int pw_get_volume (VolumePlugin *vol, gboolean input_control);
+extern int pw_set_volume (VolumePlugin *vol, int volume, gboolean input_control);
 
-#define WIDGETS_LEFT_PANEL      ""
-#define WIDGETS_LEFT_DOCK       "smenu spacing0 spacing4 tlist"
-#define WIDGETS_LEFT_WIZARD     ""
-#define WIDGETS_RIGHT_PANEL     ""
-#define WIDGETS_RIGHT_DOCK      "tray power ejecter updater spacing2 connect spacing2 bluetooth spacing2 netman spacing2 volume spacing2 clock spacing2 batt spacing2 squeek"
-#define WIDGETS_RIGHT_WIZARD    "bluetooth volume squeek"
+extern int pw_get_mute (VolumePlugin *vol, gboolean input_control);
+extern int pw_set_mute (VolumePlugin *vol, int mute, gboolean input_control);
 
-extern GtkWidget *cdlg;
+extern int pw_get_default_sink_source (VolumePlugin *vol);
+extern int pw_change_sink (VolumePlugin *vol, const char *sinkname);
+extern int pw_change_source (VolumePlugin *vol, const char *sourcename);
 
-extern void get_config_string (const char *section, const char *key, char **dest, const char *def);
-extern gboolean get_config_bool (const char *section, const char *key, const char *def);
-extern int get_config_int (const char *section, const char *key, const char *def);
-extern gboolean can_configure (const char *type, char **name);
-extern void plugin_config_dialog (const char *type);
+extern void pw_mute_all_streams (VolumePlugin *vol);
+extern void pw_unmute_all_streams (VolumePlugin *vol);
 
-#endif
+extern void pw_move_input_streams (VolumePlugin *vol);
+extern void pw_move_output_streams (VolumePlugin *vol);
+
+extern int pw_get_profile (VolumePlugin *vol, const char *card);
+extern int pw_set_profile (VolumePlugin *vol, const char *card, const char *profile);
+
+extern int pw_add_devices_to_menu (VolumePlugin *vol, gboolean internal, gboolean input_control);
+extern void pw_update_devices_in_menu (VolumePlugin *vol, gboolean input_control);
+extern int pw_add_devices_to_profile_dialog (VolumePlugin *vol);
+
+extern int pw_count_devices (VolumePlugin *vol, gboolean input_control);
 
 /* End of file */
 /*----------------------------------------------------------------------------*/

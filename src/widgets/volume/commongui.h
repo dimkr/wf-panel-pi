@@ -1,5 +1,5 @@
 /*============================================================================
-Copyright (c) 2023 Raspberry Pi
+Copyright (c) 2020-2025 Raspberry Pi
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,43 +25,33 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ============================================================================*/
 
-#ifndef PLUG_CONF_H
-#define PLUG_CONF_H
+/*----------------------------------------------------------------------------*/
+/* Prototypes                                                                 */
+/*----------------------------------------------------------------------------*/
 
-typedef enum {
-    CONF_TYPE_NONE,
-    CONF_TYPE_BOOL,
-    CONF_TYPE_INT,
-    CONF_TYPE_STRING,
-    CONF_TYPE_COLOUR,
-    CONF_TYPE_FONT,
-    CONF_TYPE_LABEL
-} CONF_TYPE;
+extern char *get_string (const char *fmt, ...);
+extern int vsystem (const char *fmt, ...);
+extern void close_widget (GtkWidget **wid);
+extern const char *device_display_name (VolumePlugin *vol, const char *name);
 
-typedef struct {
-    CONF_TYPE type;
-    const char *name;
-    const char *label;
-    void **value;
-    const char *def_val;
-} conf_table_t;
+extern void update_display (VolumePlugin *vol, gboolean input);
 
-#define WIDGETS_LEFT_PANEL      ""
-#define WIDGETS_LEFT_DOCK       "smenu spacing0 spacing4 tlist"
-#define WIDGETS_LEFT_WIZARD     ""
-#define WIDGETS_RIGHT_PANEL     ""
-#define WIDGETS_RIGHT_DOCK      "tray power ejecter updater spacing2 connect spacing2 bluetooth spacing2 netman spacing2 volume spacing2 clock spacing2 batt spacing2 squeek"
-#define WIDGETS_RIGHT_WIZARD    "bluetooth volume squeek"
+extern void menu_show (VolumePlugin *vol, gboolean input);
+extern void menu_add_item (VolumePlugin *vol, const char *label, const char *name, gboolean input);
+extern void menu_add_separator (VolumePlugin *vol, GtkWidget *menu);
+extern void menu_set_alsa_device_output (GtkWidget *widget, VolumePlugin *vol);
+extern void menu_set_bluetooth_device_output (GtkWidget *widget, VolumePlugin *vol);
+extern void menu_set_alsa_device_input (GtkWidget *widget, VolumePlugin *vol);
+extern void menu_set_bluetooth_device_input (GtkWidget *widget, VolumePlugin *vol);
 
-extern GtkWidget *cdlg;
+extern void popup_window_show (VolumePlugin *vol, gboolean input_control);
+extern void popup_window_show_timed (VolumePlugin *vol);
 
-extern void get_config_string (const char *section, const char *key, char **dest, const char *def);
-extern gboolean get_config_bool (const char *section, const char *key, const char *def);
-extern int get_config_int (const char *section, const char *key, const char *def);
-extern gboolean can_configure (const char *type, char **name);
-extern void plugin_config_dialog (const char *type);
+extern void volume_mouse_scrolled (GtkScale *scale, GdkEventScroll *evt, VolumePlugin *vol);
+extern void mic_mouse_scrolled (GtkScale *scale, GdkEventScroll *evt, VolumePlugin *vol);
 
-#endif
+extern void profiles_dialog_show (VolumePlugin *vol);
+extern void profiles_dialog_add_combo (VolumePlugin *vol, GtkListStore *ls, GtkWidget *dest, int sel, const char *label, const char *name);
 
 /* End of file */
 /*----------------------------------------------------------------------------*/

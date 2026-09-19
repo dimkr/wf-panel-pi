@@ -34,5 +34,16 @@ src/widgets/tlist/tlist.c
 src/widgets/tlist/tlist.h
 src/widgets/tlist/tlist_widget.c
 src/widgets/tlist/tlist_widget.h
+src/widgets/volume/volume.c
+src/widgets/volume/volume.h
+src/widgets/volume/commongui.c
+src/widgets/volume/commongui.h
+src/widgets/volume/bluetooth.c
+src/widgets/volume/bluetooth.h
+src/widgets/volume/pipewire.c
+src/widgets/volume/pipewire.h
+src/widgets/volume/volume_widget.c
+src/widgets/volume/volume_widget.h
 [type: gettext/glade] data/config.ui
 [type: gettext/glade] data/wf-panel-pi.ui
+[type: gettext/glade] data/lxplug-volumepulse.ui
