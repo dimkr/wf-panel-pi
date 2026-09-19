@@ -44,6 +44,10 @@ src/widgets/volume/pipewire.c
 src/widgets/volume/pipewire.h
 src/widgets/volume/volume_widget.c
 src/widgets/volume/volume_widget.h
+src/widgets/clock/clock.c
+src/widgets/clock/clock.h
+src/widgets/clock/clock_widget.c
+src/widgets/clock/clock_widget.h
 [type: gettext/glade] data/config.ui
 [type: gettext/glade] data/wf-panel-pi.ui
 [type: gettext/glade] data/lxplug-volumepulse.ui
