@@ -12,7 +12,7 @@ Rules-Requires-Root: no
 
 Package: wf-panel-pi
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libwayland-client0
+Depends: ${shlibs:Depends}, ${misc:Depends}, libwayland-client0, lxmenu-data
 Recommends: pulseaudio, pipewire, pipewire-pulse, pulseaudio-module-bluetooth,
  libspa-0.2-bluetooth, lp-connection-editor, wfplug-squeek, wfplug-connect, wfplug-menu,
  wfplug-bluetooth, wfplug-cputemp, wfplug-ejecter, wfplug-netman, wfplug-updater, wfplug-batt,

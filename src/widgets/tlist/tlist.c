@@ -89,6 +89,7 @@ static char *get_string (char *cmd);
 static char *find_alternative (const char *launch_id);
 static void add_launcher (WinlistPlugin *wl, char *id);
 static void load_launchers (WinlistPlugin *wl);
+static void add_to_launcher_cb (GtkWidget *widget, gpointer);
 static void remove_launcher (GtkWidget *widget, gpointer);
 static void close_handle (gpointer data, gpointer);
 static void destroy_toplevel_entry (gpointer data);
@@ -817,6 +818,28 @@ static void popup_menu (GtkWidget *widget, gpointer userdata)
         g_signal_connect (item, "activate", G_CALLBACK (close_app), wl);
         gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
 
+        item = gtk_separator_menu_item_new ();
+        gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
+
+        if (btn->launch_id)
+        {
+            item = gtk_menu_item_new_with_label (_("Remove from Launcher"));
+            gtk_widget_set_name (item, btn->launch_id);
+            g_signal_connect (item, "activate", G_CALLBACK (remove_launcher), NULL);
+            gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
+        }
+        else
+        {
+            char *mcid = menu_cache_id (btn->app_id);
+            if (mcid)
+            {
+                item = gtk_menu_item_new_with_label (_("Add to Launcher"));
+                gtk_widget_set_name (item, mcid);
+                g_signal_connect (item, "activate", G_CALLBACK (add_to_launcher_cb), NULL);
+                gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
+                g_free (mcid);
+            }
+        }
     }
     else if (btn->launch_id)
     {
@@ -918,6 +941,11 @@ static void load_launchers (WinlistPlugin *wl)
         launcher = strtok (NULL, " ");
     }
     g_free (lstr);
+}
+
+static void add_to_launcher_cb (GtkWidget *widget, gpointer)
+{
+    add_to_launcher (gtk_widget_get_name (widget));
 }
 
 static void remove_launcher (GtkWidget *widget, gpointer)
