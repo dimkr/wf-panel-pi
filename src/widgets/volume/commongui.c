@@ -170,18 +170,24 @@ void update_display (VolumePlugin *vol, gboolean input)
     /* update icon */
     if (input)
     {
-        if (mute) icon = "audio-input-mic-muted";
-        else icon = "audio-input-microphone";
+        if (mute) icon = "microphone-disabled-symbolic";
+        else
+        {
+            if (level >= 66) icon = "microphone-sensitivity-high-symbolic";
+            else if (level >= 33) icon = "microphone-sensitivity-medium-symbolic";
+            else if (level > 0) icon = "microphone-sensitivity-low-symbolic";
+            else icon = "microphone-disabled-symbolic";
+        }
     }
     else
     {
-        if (mute) icon = "audio-volume-muted";
+        if (mute) icon = "audio-volume-muted-symbolic";
         else
         {
-            if (level >= 66) icon = "audio-volume-high";
-            else if (level >= 33) icon = "audio-volume-medium";
-            else if (level > 0) icon = "audio-volume-low";
-            else icon = "audio-volume-silent";
+            if (level >= 66) icon = "audio-volume-high-symbolic";
+            else if (level >= 33) icon = "audio-volume-medium-symbolic";
+            else if (level > 0) icon = "audio-volume-low-symbolic";
+            else icon = "audio-volume-muted-symbolic";
         }
     }
     wrap_set_taskbar_icon (vol, vol->tray_icon[input ? 1 : 0], icon);
