@@ -39,8 +39,7 @@ typedef struct
     GtkGesture *gesture;
     GtkWidget *tray_icon;           /* Displayed image */
     battery *batt;
-    GdkPixbuf *plug;
-    GdkPixbuf *flash;
+    GdkPixbuf *icons[33];
     guint timer;
     guint vtimer;
     int batt_num;
