@@ -8,7 +8,8 @@
 
 typedef struct {
     GtkWidget *plugin;
-    GtkWidget *label;
+    GtkWidget *tray_icon;           /* Displayed image */
+    GdkPixbuf *icons[7];            /* cached pixbufs: 0=offline, 1=ethernet, 2-6=wifi signal */
     GtkGesture *gesture;
     guint timer;
     GDBusConnection *dbus_conn;

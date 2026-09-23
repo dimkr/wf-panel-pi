@@ -240,6 +240,16 @@ static void get_status_from_sysfs (NetStatus *status)
     closedir (dir);
 }
 
+static const char *net_icon_names[7] = {
+    "network-offline-symbolic",               /* 0: offline */
+    "network-wired-symbolic",                 /* 1: ethernet */
+    "network-wireless-signal-none-symbolic",  /* 2: wifi 0-20% */
+    "network-wireless-signal-weak-symbolic",  /* 3: wifi 21-40% */
+    "network-wireless-signal-ok-symbolic",    /* 4: wifi 41-60% */
+    "network-wireless-signal-good-symbolic",  /* 5: wifi 61-80% */
+    "network-wireless-signal-excellent-symbolic", /* 6: wifi 81-100% */
+};
+
 static void update_net_status (NetmanPlugin *net)
 {
     NetStatus status;
@@ -251,44 +261,68 @@ static void update_net_status (NetmanPlugin *net)
         get_status_from_sysfs (&status);
     }
 
-    char label_buf[64];
-    char tooltip_buf[512];
+    int idx = 0;
+    static char tooltip_buf[512];
 
     if (status.type == NET_TYPE_WIFI)
     {
-        /* format-wifi: "\uf1eb {signalStrength}%" */
-        snprintf (label_buf, sizeof (label_buf), "\uf1eb %d%%", status.strength);
+        if (status.strength <= 0) idx = 2;
+        else if (status.strength <= 20) idx = 2;
+        else if (status.strength <= 40) idx = 3;
+        else if (status.strength <= 60) idx = 4;
+        else if (status.strength <= 80) idx = 5;
+        else idx = 6;
 
-        /* tooltip-format-wifi: "{essid}" */
         if (status.ssid[0] && status.ifname[0])
-            snprintf (tooltip_buf, sizeof (tooltip_buf), "%s (%s)", status.ssid, status.ifname);
+        {
+            snprintf (tooltip_buf, sizeof (tooltip_buf), "%s (%s) %d%%", status.ssid, status.ifname, status.strength);
+            gtk_widget_set_tooltip_text (net->plugin, tooltip_buf);
+        }
         else if (status.ssid[0])
-            snprintf (tooltip_buf, sizeof (tooltip_buf), "%s", status.ssid);
+        {
+            snprintf (tooltip_buf, sizeof (tooltip_buf), "%s %d%%", status.ssid, status.strength);
+            gtk_widget_set_tooltip_text (net->plugin, tooltip_buf);
+        }
         else if (status.ifname[0])
-            snprintf (tooltip_buf, sizeof (tooltip_buf), "%s", status.ifname);
+        {
+            snprintf (tooltip_buf, sizeof (tooltip_buf), "%s %d%%", status.ifname, status.strength);
+            gtk_widget_set_tooltip_text (net->plugin, tooltip_buf);
+        }
         else
-            snprintf (tooltip_buf, sizeof (tooltip_buf), "%s", _("WiFi"));
+        {
+            gtk_widget_set_tooltip_text (net->plugin, _("WiFi"));
+        }
     }
     else if (status.type == NET_TYPE_ETHERNET)
     {
-        /* format-ethernet: "\uf0c1 wired" */
-        snprintf (label_buf, sizeof (label_buf), "\uf0c1 wired");
+        idx = 1;
 
-        /* tooltip-format: "{ifname}" */
         if (status.ifname[0])
-            snprintf (tooltip_buf, sizeof (tooltip_buf), "%s", status.ifname);
+        {
+            gtk_widget_set_tooltip_text (net->plugin, status.ifname);
+        }
         else
-            snprintf (tooltip_buf, sizeof (tooltip_buf), "%s", _("Ethernet"));
+        {
+            gtk_widget_set_tooltip_text (net->plugin, _("Ethernet"));
+        }
     }
     else
     {
-        /* format: "\uf127 offline" */
-        snprintf (label_buf, sizeof (label_buf), "\uf127 offline");
-        snprintf (tooltip_buf, sizeof (tooltip_buf), "%s", _("Offline"));
+        gtk_widget_set_tooltip_text (net->plugin, _("Offline"));
     }
 
-    gtk_label_set_text (GTK_LABEL (net->label), label_buf);
-    gtk_widget_set_tooltip_text (net->plugin, tooltip_buf);
+    if (!net->icons[idx])
+    {
+        net->icons[idx] = gtk_icon_theme_load_icon_for_scale (
+            gtk_icon_theme_get_default (),
+            net_icon_names[idx],
+            wrap_icon_size (net),
+            gtk_widget_get_scale_factor (net->tray_icon),
+            GTK_ICON_LOOKUP_FORCE_SIZE,
+            NULL);
+    }
+
+    if (net->icons[idx]) set_image_from_pixbuf (net->tray_icon, net->icons[idx]);
     gtk_widget_show_all (net->plugin);
 }
 
@@ -306,6 +340,15 @@ static void netman_button_clicked (GtkWidget *widget, NetmanPlugin *net)
 
 void netman_update_display (NetmanPlugin *net)
 {
+    int i;
+    for (i = 0; i < 7; i++)
+    {
+        if (net->icons[i])
+        {
+            g_object_unref (net->icons[i]);
+            net->icons[i] = NULL;
+        }
+    }
     update_net_status (net);
 }
 
@@ -315,12 +358,8 @@ void netman_init (NetmanPlugin *net)
     bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
     bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
 
-    net->label = gtk_label_new (NULL);
-    gtk_widget_set_margin_start (net->label, 4);
-    gtk_widget_set_margin_end (net->label, 4);
-    gtk_label_set_xalign (GTK_LABEL (net->label), 0.5);
-
-    gtk_container_add (GTK_CONTAINER (net->plugin), net->label);
+    net->tray_icon = gtk_image_new ();
+    gtk_container_add (GTK_CONTAINER (net->plugin), net->tray_icon);
     gtk_button_set_relief (GTK_BUTTON (net->plugin), GTK_RELIEF_NONE);
 
     g_signal_connect (net->plugin, "clicked", G_CALLBACK (netman_button_clicked), net);
@@ -338,6 +377,11 @@ void netman_destructor (gpointer user_data)
 
     if (net->timer)
         g_source_remove (net->timer);
+
+    for (int i = 0; i < 7; i++)
+    {
+        if (net->icons[i]) g_object_unref (net->icons[i]);
+    }
 
     g_free (net);
 }
