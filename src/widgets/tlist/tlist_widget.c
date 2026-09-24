@@ -35,8 +35,16 @@ static void widget_tlist_init (PanelWidget *self, GtkWidget *container)
     /* Create the button */
     w->plugin = gtk_scrolled_window_new (NULL, NULL);
     gtk_widget_set_name (w->plugin, PLUGIN_NAME);
-    gtk_scrolled_window_set_propagate_natural_width (GTK_SCROLLED_WINDOW (w->plugin), TRUE);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (w->plugin), GTK_POLICY_EXTERNAL, GTK_POLICY_NEVER);
+    if (panel_is_vertical (container))
+    {
+        gtk_scrolled_window_set_propagate_natural_height (GTK_SCROLLED_WINDOW (w->plugin), TRUE);
+        gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (w->plugin), GTK_POLICY_NEVER, GTK_POLICY_EXTERNAL);
+    }
+    else
+    {
+        gtk_scrolled_window_set_propagate_natural_width (GTK_SCROLLED_WINDOW (w->plugin), TRUE);
+        gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (w->plugin), GTK_POLICY_EXTERNAL, GTK_POLICY_NEVER);
+    }
 
     gtk_box_pack_start (GTK_BOX (container), w->plugin, FALSE, FALSE, 0);
 

@@ -151,10 +151,10 @@ Panel *panel_new (gboolean is_dock)
     gtk_gesture_single_set_touch_only (GTK_GESTURE_SINGLE (panel->gesture), gestures_touch_only);
 
     // Create the window
-    panel->content_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-    panel->left_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-    panel->right_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-    panel->right2_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+    panel->content_box = gtk_box_new (panel->dock ? GTK_ORIENTATION_VERTICAL : GTK_ORIENTATION_HORIZONTAL, 0);
+    panel->left_box = gtk_box_new (panel->dock ? GTK_ORIENTATION_VERTICAL : GTK_ORIENTATION_HORIZONTAL, 0);
+    panel->right_box = gtk_box_new (panel->dock ? GTK_ORIENTATION_VERTICAL : GTK_ORIENTATION_HORIZONTAL, 0);
+    panel->right2_box = gtk_box_new (panel->dock ? GTK_ORIENTATION_VERTICAL : GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start (GTK_BOX (panel->content_box), panel->left_box, FALSE, FALSE, 0);
     if (panel->dock)
     {
@@ -276,8 +276,10 @@ static void set_exclusive (Panel *panel)
 {
     if (panel->dock)
     {
-        gtk_layer_set_anchor (GTK_WINDOW (panel->window->window), GTK_LAYER_SHELL_EDGE_LEFT, FALSE);
+        gtk_layer_set_anchor (GTK_WINDOW (panel->window->window), GTK_LAYER_SHELL_EDGE_TOP, FALSE);
+        gtk_layer_set_anchor (GTK_WINDOW (panel->window->window), GTK_LAYER_SHELL_EDGE_BOTTOM, FALSE);
         gtk_layer_set_anchor (GTK_WINDOW (panel->window->window), GTK_LAYER_SHELL_EDGE_RIGHT, FALSE);
+        gtk_layer_set_anchor (GTK_WINDOW (panel->window->window), GTK_LAYER_SHELL_EDGE_LEFT, FALSE);
     }
     else
     {
@@ -657,12 +659,13 @@ static gboolean on_draw_dock_layout (GtkWidget *widget, cairo_t *cr, gpointer us
 
     if (panel->dock && panel->right_widgets)
     {
-        // organise the dock tray widgets so the bottom is never wider than the top, and the overall width is as narrow as possible...
+        // organise the dock tray widgets so the second column is never taller than the first, and the overall size is as compact as possible...
         GtkRequisition min, pref;
         GtkWidget *plugin;
         GList *children, *l;
         int top, last, btm;
         gboolean split;
+        gboolean vertical = gtk_orientable_get_orientation (GTK_ORIENTABLE (panel->right_box)) == GTK_ORIENTATION_VERTICAL;
 
         while (1)
         {
@@ -677,8 +680,8 @@ static gboolean on_draw_dock_layout (GtkWidget *widget, cairo_t *cr, gpointer us
                 GtkWidget *w = GTK_WIDGET (l->data);
                 if (!g_strcmp0 (gtk_widget_get_name (w), "split")) split = TRUE;
                 gtk_widget_get_preferred_size (w, &min, &pref);
-                last = pref.width;
-                top += pref.width;
+                last = vertical ? pref.height : pref.width;
+                top += vertical ? pref.height : pref.width;
             }
             g_list_free (children);
 
@@ -702,7 +705,7 @@ static gboolean on_draw_dock_layout (GtkWidget *widget, cairo_t *cr, gpointer us
             {
                 GtkWidget *w = GTK_WIDGET (l->data);
                 gtk_widget_get_preferred_size (w, &min, &pref);
-                btm += pref.width;
+                btm += vertical ? pref.height : pref.width;
             }
             g_list_free (children);
 

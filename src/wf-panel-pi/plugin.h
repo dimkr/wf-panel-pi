@@ -94,6 +94,7 @@ extern MenuCacheItem *get_cache_item (const char *app_id);
 
 extern GtkWindow *find_panel (GtkWidget *btn);
 extern gboolean panel_at_bottom (GtkWidget *btn);
+extern gboolean panel_is_vertical (GtkWidget *btn);
 extern int get_icon_size (GtkWidget *widget);
 extern GdkPixbuf *load_taskbar_pixbuf (GtkWidget *image, const char *icon_name);
 extern void set_image_from_pixbuf (GtkWidget *image, GdkPixbuf *pixbuf);

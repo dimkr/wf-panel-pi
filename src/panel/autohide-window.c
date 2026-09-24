@@ -43,6 +43,7 @@ extern GtkWindow *popwindow;
 /*----------------------------------------------------------------------------*/
 
 static GtkLayerShellEdge get_anchor_edge (AutohidingWindow *win);
+static gboolean is_vertical_edge (AutohidingWindow *win);
 static void increase_autohide (AutohidingWindow *win);
 static void decrease_autohide (AutohidingWindow *win);
 static gboolean should_autohide (AutohidingWindow *win);
@@ -115,7 +116,9 @@ void autohide_window_free (AutohidingWindow *win)
 
 void autohide_window_set_auto_exclusive_zone (AutohidingWindow *win, gboolean has_zone)
 {
-    int target_zone = has_zone ? gtk_widget_get_allocated_height (win->window) : 0;
+    int target_zone = has_zone ? (is_vertical_edge (win)
+        ? gtk_widget_get_allocated_width (win->window)
+        : gtk_widget_get_allocated_height (win->window)) : 0;
     win->has_auto_exclusive_zone = has_zone;
 
     if (win->last_zone != target_zone)
@@ -177,7 +180,15 @@ void autohide_window_set_monitor (AutohidingWindow *win)
 static GtkLayerShellEdge get_anchor_edge (AutohidingWindow *win)
 {
     if (!g_strcmp0 (win->position, "bottom")) return GTK_LAYER_SHELL_EDGE_BOTTOM;
+    if (!g_strcmp0 (win->position, "left")) return GTK_LAYER_SHELL_EDGE_LEFT;
+    if (!g_strcmp0 (win->position, "right")) return GTK_LAYER_SHELL_EDGE_RIGHT;
     return GTK_LAYER_SHELL_EDGE_TOP;
+}
+
+static gboolean is_vertical_edge (AutohidingWindow *win)
+{
+    GtkLayerShellEdge edge = get_anchor_edge (win);
+    return edge == GTK_LAYER_SHELL_EDGE_LEFT || edge == GTK_LAYER_SHELL_EDGE_RIGHT;
 }
 
 static void increase_autohide (AutohidingWindow *win)
@@ -208,9 +219,12 @@ static void start_animation (AutohidingWindow *win, int target)
 static gboolean do_hide (gpointer userdata)
 {
     AutohidingWindow *win = (AutohidingWindow *) userdata;
+    int size = is_vertical_edge (win)
+        ? gtk_widget_get_allocated_width (win->window)
+        : gtk_widget_get_allocated_height (win->window);
 
     win->pending_hide = 0;
-    start_animation (win, win->remainder - gtk_widget_get_allocated_height (win->window));
+    start_animation (win, win->remainder - size);
     update_margin (win);
     return G_SOURCE_REMOVE;
 }
@@ -258,12 +272,17 @@ void autohide_window_update_position (AutohidingWindow *win)
     /* Reset old anchors */
     gtk_layer_set_anchor (GTK_WINDOW (win->window), GTK_LAYER_SHELL_EDGE_TOP, FALSE);
     gtk_layer_set_anchor (GTK_WINDOW (win->window), GTK_LAYER_SHELL_EDGE_BOTTOM, FALSE);
+    gtk_layer_set_anchor (GTK_WINDOW (win->window), GTK_LAYER_SHELL_EDGE_LEFT, FALSE);
+    gtk_layer_set_anchor (GTK_WINDOW (win->window), GTK_LAYER_SHELL_EDGE_RIGHT, FALSE);
 
     /* Set new anchor */
     gtk_layer_set_anchor (GTK_WINDOW (win->window), get_anchor_edge (win), TRUE);
 
     /* When the position changes, show an animation from the new edge. */
-    start_animation (win, -gtk_widget_get_allocated_height (win->window));
+    int size = is_vertical_edge (win)
+        ? gtk_widget_get_allocated_width (win->window)
+        : gtk_widget_get_allocated_height (win->window);
+    start_animation (win, -size);
 
     /* Show the window */
     schedule_show (win, 0);
@@ -334,7 +353,7 @@ static unsigned char load_config (AutohidingWindow *win)
     char *tmp;
     int val;
 
-    get_config_string (win->dock ? "dock" : "panel", "position", &tmp, win->dock ? "bottom" : "top");
+    get_config_string (win->dock ? "dock" : "panel", "position", &tmp, win->dock ? "left" : "top");
     if (g_strcmp0 (tmp, win->position))
     {
         g_free (win->position);
@@ -453,15 +472,35 @@ static gboolean on_leave_notify_event (GtkWidget *widget, GdkEventCrossing *ev, 
     }
 
     // don't hide if leaving a window towards the closest edge
-    if (ev->x > MARGIN && ev->x < gtk_widget_get_allocated_width (win->window) - MARGIN)
+    GtkLayerShellEdge edge = get_anchor_edge (win);
+    if (edge == GTK_LAYER_SHELL_EDGE_LEFT || edge == GTK_LAYER_SHELL_EDGE_RIGHT)
     {
-        if (get_anchor_edge (win) == GTK_LAYER_SHELL_EDGE_TOP)
+        // vertical panel: check y is within bounds, then check x towards the anchor edge
+        if (ev->y > MARGIN && ev->y < gtk_widget_get_allocated_height (win->window) - MARGIN)
         {
-            if (ev->y < MARGIN) return FALSE;
+            if (edge == GTK_LAYER_SHELL_EDGE_LEFT)
+            {
+                if (ev->x < MARGIN) return FALSE;
+            }
+            else
+            {
+                if (ev->x > gtk_widget_get_allocated_width (win->window) - MARGIN) return FALSE;
+            }
         }
-        else
+    }
+    else
+    {
+        // horizontal panel: check x is within bounds, then check y towards the anchor edge
+        if (ev->x > MARGIN && ev->x < gtk_widget_get_allocated_width (win->window) - MARGIN)
         {
-            if (ev->y > gtk_widget_get_allocated_height (win->window) - MARGIN) return FALSE;
+            if (edge == GTK_LAYER_SHELL_EDGE_TOP)
+            {
+                if (ev->y < MARGIN) return FALSE;
+            }
+            else
+            {
+                if (ev->y > gtk_widget_get_allocated_height (win->window) - MARGIN) return FALSE;
+            }
         }
     }
 

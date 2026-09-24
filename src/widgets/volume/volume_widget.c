@@ -19,7 +19,7 @@ static void widget_volume_init (PanelWidget *self, GtkWidget *container)
     WidgetVolume *w = (WidgetVolume *) self;
 
     /* Create the button */
-    w->plugin = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+    w->plugin = gtk_box_new (panel_is_vertical (container) ? GTK_ORIENTATION_VERTICAL : GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_widget_set_name (w->plugin, PLUGIN_NAME);
     gtk_box_pack_start (GTK_BOX (container), w->plugin, FALSE, FALSE, 0);
 

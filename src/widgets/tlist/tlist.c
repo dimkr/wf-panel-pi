@@ -1030,20 +1030,21 @@ static void handle_gesture_end (GtkGestureLongPress *, GdkEventSequence *, gpoin
     if (pressed == PRESS_LONG) popup_menu (btn->btn, btn);
 }
 
-static void handle_drag_begin (GtkGestureDrag *, gdouble x, gdouble, gpointer userdata)
+static void handle_drag_begin (GtkGestureDrag *, gdouble x, gdouble y, gpointer userdata)
 {
     WinlistPlugin *wl = (WinlistPlugin *) userdata;
-    wl->drag_start = x;
+    wl->drag_start = panel_is_vertical (wl->plugin) ? y : x;
 }
 
-static void handle_drag_update (GtkGestureDrag *, gdouble x, gdouble, gpointer userdata)
+static void handle_drag_update (GtkGestureDrag *, gdouble x, gdouble y, gpointer userdata)
 {
     WinlistPlugin *wl = (WinlistPlugin *) userdata;
     GtkStyleContext *sc;
     GList *children, *index;
     int moveby, width;
+    gdouble drag_delta = panel_is_vertical (wl->plugin) ? y : x;
 
-    if (!wl->dragon && x < DRAG_THRESH && x > -DRAG_THRESH) return;
+    if (!wl->dragon && drag_delta < DRAG_THRESH && drag_delta > -DRAG_THRESH) return;
 
     wl->dragon = TRUE;
     pressed = PRESS_NONE;
@@ -1054,8 +1055,8 @@ static void handle_drag_update (GtkGestureDrag *, gdouble x, gdouble, gpointer u
     width = get_icon_size (wl->plugin);
 
     moveby = 0;
-    if (wl->drag_start + x < -DRAG_THRESH) moveby = -1;
-    if (wl->drag_start + x > width + DRAG_THRESH) moveby = 1;
+    if (wl->drag_start + drag_delta < -DRAG_THRESH) moveby = -1;
+    if (wl->drag_start + drag_delta > width + DRAG_THRESH) moveby = 1;
     if (!moveby) return;
 
     children = gtk_container_get_children (GTK_CONTAINER (wl->box));
@@ -1164,7 +1165,7 @@ void wlist_init (WinlistPlugin *wl)
     bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
 
     /* Set up variables */
-    wl->box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, wl->spacing);
+    wl->box = gtk_box_new (panel_is_vertical (wl->plugin) ? GTK_ORIENTATION_VERTICAL : GTK_ORIENTATION_HORIZONTAL, wl->spacing);
     gtk_box_set_homogeneous (GTK_BOX (wl->box), TRUE);
     gtk_box_set_spacing (GTK_BOX (wl->box), wl->spacing);
     gtk_container_add (GTK_CONTAINER (wl->plugin), wl->box);

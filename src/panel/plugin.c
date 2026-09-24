@@ -114,6 +114,14 @@ gboolean panel_at_bottom (GtkWidget *btn)
     return gtk_layer_get_anchor (panel, GTK_LAYER_SHELL_EDGE_BOTTOM);
 }
 
+gboolean panel_is_vertical (GtkWidget *btn)
+{
+    GtkWindow *panel = find_panel (btn);
+    if (!panel) return FALSE;
+    return gtk_layer_get_anchor (panel, GTK_LAYER_SHELL_EDGE_LEFT) ||
+           gtk_layer_get_anchor (panel, GTK_LAYER_SHELL_EDGE_RIGHT);
+}
+
 int get_icon_size (GtkWidget *widget)
 {
     GtkWindow *panel = find_panel (widget);
